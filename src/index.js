@@ -1,5 +1,8 @@
 const { declare } = require("@babel/helper-plugin-utils");
 const { classExtendsReact } = require("./helpers/classExtendsReact");
+const {
+  buildFunctionFromClassDeclaration
+} = require("./helpers/functionDeclarationHelper");
 
 module.exports = declare(api => {
   api.assertVersion(7);
@@ -9,7 +12,7 @@ module.exports = declare(api => {
     visitor: {
       ClassDeclaration(path) {
         if (classExtendsReact(path.node)) {
-          console.log(true);
+          path.replaceWith(buildFunctionFromClassDeclaration(path.node));
         }
       }
     }
