@@ -1,0 +1,28 @@
+{
+  "name": "babel-plugin-react-functionize",
+  "version": "1.0.0",
+  "description": "Transpaile react classes to function components",
+  "main": "./src/index.js",
+  "scripts": {
+    "build": "babel sample/ -d output",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kapantzak/babel-plugin-react-functionize.git"
+  },
+  "author": "John Kapantzakis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kapantzak/babel-plugin-react-functionize/issues"
+  },
+  "homepage": "https://github.com/kapantzak/babel-plugin-react-functionize#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.8.3",
+    "@babel/helper-plugin-utils": "^7.8.3",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-syntax-jsx": "^7.8.3",
+    "@types/babel__core": "^7.1.3"
+  }
+}
