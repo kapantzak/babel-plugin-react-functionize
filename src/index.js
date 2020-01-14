@@ -1,5 +1,5 @@
 const { declare } = require("@babel/helper-plugin-utils");
-const { types: t } = require("@babel/core");
+const { classExtendsReact } = require("./helpers/classExtendsReact");
 
 module.exports = declare(api => {
   api.assertVersion(7);
@@ -8,7 +8,9 @@ module.exports = declare(api => {
     name: "react-functionize",
     visitor: {
       ClassDeclaration(path) {
-        path.remove();
+        if (classExtendsReact(path.node)) {
+          console.log(true);
+        }
       }
     }
   };

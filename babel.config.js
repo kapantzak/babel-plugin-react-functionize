@@ -6,7 +6,7 @@ module.exports = function(api) {
   return {
     presets: [],
     plugins: [
-      "./src",
+      "./src/index.js",
       "@babel/plugin-proposal-class-properties",
       "@babel/plugin-syntax-jsx"
     ]
