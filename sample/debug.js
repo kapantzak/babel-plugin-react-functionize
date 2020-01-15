@@ -10,6 +10,7 @@ class App extends React.Component {
       <div>
         <h3> This is a Class Component </h3>
         <button onClick={this.alertName}> Alert </button>
+        <button onClick={foo.bar}> Alert </button>
       </div>
     );
   }

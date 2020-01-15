@@ -12,7 +12,7 @@ module.exports = declare(api => {
     visitor: {
       ClassDeclaration(path) {
         if (classExtendsReact(path.node)) {
-          path.replaceWith(buildFunctionFromClassDeclaration(path.node));
+          path.replaceWith(buildFunctionFromClassDeclaration(path));
         }
       }
     }
