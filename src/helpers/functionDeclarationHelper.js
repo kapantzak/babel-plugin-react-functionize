@@ -1,4 +1,5 @@
 const { types: t } = require("@babel/core");
+const { removeThisExpression } = require("./removeThisHelper");
 
 const buildFunctionFromClassDeclaration = classDeclarationPath => {
   const functionBody = iterateClassDeclarationBody(classDeclarationPath);
@@ -57,7 +58,7 @@ const renderMethodToReturnStatement = classMethodPath => {
   const returnStatementPath = classMethodBody
     .get("body")
     .find(x => t.isReturnStatement(x));
-  return returnStatementPath.node;
+  return removeThisExpression(returnStatementPath).node;
 };
 
 const componentDidMountToUseEffect = classMethodPath => {

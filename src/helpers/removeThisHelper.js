@@ -1,3 +1,5 @@
+const { types: t } = require("@babel/core");
+
 const removeThisExpression = path => {
   path.traverse(thisExpressionVisitor);
   return path;
@@ -5,7 +7,8 @@ const removeThisExpression = path => {
 
 const thisExpressionVisitor = {
   ThisExpression(path) {
-    console.log(path);
+    const identifier = t.identifier(path.parent.property.name);
+    path.parentPath.replaceWith(identifier);
   }
 };
 
