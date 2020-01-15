@@ -13,3 +13,4 @@ const thisExpressionVisitor = {
 };
 
 exports.removeThisExpression = removeThisExpression;
+exports.thisExpressionVisitor = thisExpressionVisitor;
