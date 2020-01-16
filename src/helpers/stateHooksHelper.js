@@ -90,5 +90,6 @@ const generateSetterName = propName => {
 };
 
 exports.exportStateOutOfConstructor = exportStateOutOfConstructor;
+exports.memberExpressionIsState = memberExpressionIsState;
 exports.generateStateHook = generateStateHook;
 exports.generateSetterName = generateSetterName;
