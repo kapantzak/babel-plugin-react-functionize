@@ -1,17 +1,27 @@
-import React from "react";
+import React, { Component } from "react";
 
-class App extends React.Component {
-  alertName = () => {
-    alert("John Doe");
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0,
+      name: "John"
+    };
+    this.methodName = this.methodName.bind(this);
+  }
+
+  methodName = () => {
+    this.state.name = "John";
   };
+
+  //componentDidMount() {
+  //console.log("");
+  //}
 
   render() {
     return (
       <div>
-        <h3> This is a Class Component </h3>
-        <button onClick={this.alertName}> Alert </button>
-        <button onClick={this.foo.bar}> Alert </button>
-        <button onClick={foo.bar}> Alert </button>
+        <input type="checkbox" onChange={this.methodName} />
       </div>
     );
   }
