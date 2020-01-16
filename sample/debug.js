@@ -7,6 +7,8 @@ class App extends Component {
       count: 0,
       name: "John"
     };
+    this.state.foo = "bar";
+    this.state.age = 38;
     this.methodName = this.methodName.bind(this);
   }
 

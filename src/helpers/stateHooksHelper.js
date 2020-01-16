@@ -1,5 +1,6 @@
 const { types: t } = require("@babel/core");
 const { default: template } = require("@babel/template");
+const { default: generate } = require("@babel/generator");
 
 /**
  * Takes the constructor path and exports any state as state hooks
@@ -14,7 +15,7 @@ const exportStateOutOfConstructor = path => {
 
 const constructorVisitor = {
   AssignmentExpression(path) {
-    if (isStateAssignmentExpression(path.node)) {
+    if (isStateAssignmentExpression(path)) {
       generateStateHooks(path.node).forEach(x => {
         this.nodes.push(x);
       });
@@ -24,26 +25,21 @@ const constructorVisitor = {
 
 /**
  * Checks if the provided assignment expression is a state assignment
- * @param {node} assignmentExpressionNode
+ * @param {path} assignmentExpressionPath
  * @returns {boolean}
  */
-const isStateAssignmentExpression = assignmentExpressionNode => {
-  const isEqualOperator = assignmentExpressionNode.operator === "=";
-  const leftIsState = memberExpressionIsState(assignmentExpressionNode.left);
-  return isEqualOperator && leftIsState;
-};
-
-/**
- * Checks if the provided member expression is a 'this.state' expression
- * @param {node} memberExpression
- * @returns {boolean}
- */
-const memberExpressionIsState = memberExpression => {
-  const hasThisExpression =
-    ((memberExpression || {}).object || {}).type === "ThisExpression";
-  const hasPropertyState =
-    ((memberExpression || {}).property || {}).name === "state";
-  return hasThisExpression && hasPropertyState;
+const isStateAssignmentExpression = assignmentExpressionPath => {
+  let isState = false;
+  assignmentExpressionPath.traverse({
+    ThisExpression(path) {
+      if (
+        ((path.parentPath.get("property") || {}).node || {}).name === "state"
+      ) {
+        isState = true;
+      }
+    }
+  });
+  return isState;
 };
 
 /**
@@ -52,8 +48,25 @@ const memberExpressionIsState = memberExpression => {
  * @returns {Array<nodes>}
  */
 const generateStateHooks = assignmentExpressionNode => {
-  const stateProps = (assignmentExpressionNode.right || {}).properties || [];
-  return stateProps.map(prop => generateStateHook(prop));
+  const leftMemberExpressionLiteral = generate(assignmentExpressionNode.left, {
+    concise: true
+  }).code;
+  if (leftMemberExpressionLiteral === "this.state") {
+    if (t.isObjectExpression(assignmentExpressionNode.right)) {
+      const stateProps =
+        (assignmentExpressionNode.right || {}).properties || [];
+      return stateProps.map(prop => generateStateHook(prop));
+    }
+  } else {
+    const tokens = leftMemberExpressionLiteral.split(".");
+    if (tokens.length === 3 && tokens.slice(0, 2).join(".") === "this.state") {
+      const prop = t.objectProperty(
+        t.identifier(tokens[2]),
+        assignmentExpressionNode.right
+      );
+      return [prop].map(prop => generateStateHook(prop));
+    }
+  }
 };
 
 /**
@@ -90,6 +103,6 @@ const generateSetterName = propName => {
 };
 
 exports.exportStateOutOfConstructor = exportStateOutOfConstructor;
-exports.memberExpressionIsState = memberExpressionIsState;
+// exports.memberExpressionIsState = memberExpressionIsState;
 exports.generateStateHook = generateStateHook;
 exports.generateSetterName = generateSetterName;

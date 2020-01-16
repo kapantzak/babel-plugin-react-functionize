@@ -1,48 +1,9 @@
 const { types: t } = require("@babel/core");
 const { default: generate } = require("@babel/generator");
 const {
-  memberExpressionIsState,
   generateStateHook,
   generateSetterName
 } = require("../src/helpers/stateHooksHelper");
-
-describe("memberExpressionIsState()", () => {
-  it("Should return true for 'this.state'", () => {
-    const memberExpression = t.memberExpression(
-      t.thisExpression(),
-      t.identifier("state")
-    );
-    const result = memberExpressionIsState(memberExpression);
-    expect(result).toBe(true);
-  });
-
-  it("Should return false for 'this.foo'", () => {
-    const memberExpression = t.memberExpression(
-      t.thisExpression(),
-      t.identifier("foo")
-    );
-    const result = memberExpressionIsState(memberExpression);
-    expect(result).toBe(false);
-  });
-
-  it("Should return false for 'foo.bar'", () => {
-    const memberExpression = t.memberExpression(
-      t.identifier("foo"),
-      t.identifier("bar")
-    );
-    const result = memberExpressionIsState(memberExpression);
-    expect(result).toBe(false);
-  });
-
-  //   it("Should return false for 'this.state.bar'", () => {
-  //     const memberExpression = t.memberExpression(
-  //       t.memberExpression(t.thisExpression(), t.identifier("state")),
-  //       t.identifier("bar")
-  //     );
-  //     const result = memberExpressionIsState(memberExpression);
-  //     expect(result).toBe(false);
-  //   });
-});
 
 describe("generateStateHook()", () => {
   it("Should return the correct declaration for 'propName': 'propValue'", () => {
