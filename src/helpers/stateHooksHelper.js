@@ -58,20 +58,21 @@ const generateStateHooks = assignmentExpressionNode => {
 
 /**
  * Converts an assignment expression property to a variable declaration
- * @param {*} prop
+ * @param {node} prop
  * @returns {node}
  */
 const generateStateHook = prop => {
-  const buildRequire = template(`
-      const [%%getter%%, %%setter%%] = useState(%%defaultValue%%);
-    `);
-
   const getterName = prop.key.name;
   const setterName = generateSetterName(getterName);
+
+  const buildRequire = template`
+    const [GETTER, SETTER] = useState(DEFAULT_VALUE);
+  `;
+
   return buildRequire({
-    getter: t.identifier(getterName),
-    setter: t.identifier(setterName),
-    defaultValue: prop.value
+    GETTER: t.identifier(getterName),
+    SETTER: t.identifier(setterName),
+    DEFAULT_VALUE: prop.value
   });
 };
 
@@ -89,3 +90,5 @@ const generateSetterName = propName => {
 };
 
 exports.exportStateOutOfConstructor = exportStateOutOfConstructor;
+exports.generateStateHook = generateStateHook;
+exports.generateSetterName = generateSetterName;
