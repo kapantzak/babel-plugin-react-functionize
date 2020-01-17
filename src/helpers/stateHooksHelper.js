@@ -42,6 +42,20 @@ const isStateAssignmentExpression = assignmentExpressionPath => {
   return isState;
 };
 
+const isStateCallExpression = callExpressionPath => {
+  let isState = false;
+  const callee = callExpressionPath.get("callee");
+  if (
+    t.isMemberExpression(callee) &&
+    t.isThisExpression(callee.get("object")) &&
+    t.isIdentifier(callee.get("property")) &&
+    callee.get("property").get("name").node === "setState"
+  ) {
+    isState = true;
+  }
+  return isState;
+};
+
 /**
  * Extracts the properties of a state assignment expression and returns state hooks expression nodes
  * @param {node} assignmentExpressionNode
@@ -117,11 +131,22 @@ const exportStateSettersOutOfPath = path => {
 };
 
 const stateSetterVisitor = {
+  CallExpression(path) {
+    if (isStateCallExpression(path)) {
+      path.replaceWithMultiple(generateStateSetterFromCallExpression(path));
+    }
+  },
   AssignmentExpression(path) {
     if (isStateAssignmentExpression(path)) {
-      path.replaceWith(generateStateSetter(path));
+      path.replaceWith(generateStateSetterFromAssignment(path));
     }
   }
+};
+
+const generateStateSetterFromCallExpression = callExpressionPath => {
+  return callExpressionPath.node.arguments[0].properties.map(x =>
+    t.callExpression(t.identifier(generateSetterName(x.key.name)), [x.value])
+  );
 };
 
 /**
@@ -129,7 +154,7 @@ const stateSetterVisitor = {
  * @param {path} stateAssignmentExpressionPath
  * @returns {node}
  */
-const generateStateSetter = stateAssignmentExpressionPath => {
+const generateStateSetterFromAssignment = stateAssignmentExpressionPath => {
   const stateAssignmentExpressionNode = stateAssignmentExpressionPath.node;
   const leftMemberExpressionLiteral = generate(
     stateAssignmentExpressionNode.left,
