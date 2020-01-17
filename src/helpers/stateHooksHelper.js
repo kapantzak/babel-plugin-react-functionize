@@ -69,6 +69,16 @@ const generateStateHooks = assignmentExpressionNode => {
   }
 };
 
+const generateStateHooksFromClassProperty = path => {
+  const hooks = [];
+  path.traverse({
+    ObjectProperty(path) {
+      hooks.push(generateStateHook(path.node));
+    }
+  });
+  return hooks;
+};
+
 /**
  * Converts an assignment expression property to a variable declaration
  * @param {node} prop
@@ -140,5 +150,6 @@ exports.exportStateOutOfConstructor = exportStateOutOfConstructor;
 exports.exportStateSettersOutOfPath = exportStateSettersOutOfPath;
 exports.isStateAssignmentExpression = isStateAssignmentExpression;
 exports.generateStateHooks = generateStateHooks;
+exports.generateStateHooksFromClassProperty = generateStateHooksFromClassProperty;
 exports.generateStateHook = generateStateHook;
 exports.generateSetterName = generateSetterName;

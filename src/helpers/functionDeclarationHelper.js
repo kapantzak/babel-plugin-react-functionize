@@ -1,7 +1,8 @@
 const { types: t } = require("@babel/core");
 const {
   exportStateOutOfConstructor,
-  exportStateSettersOutOfPath
+  exportStateSettersOutOfPath,
+  generateStateHooksFromClassProperty
 } = require("./stateHooksHelper");
 const { removeThisExpression } = require("./removeThisHelper");
 
@@ -45,12 +46,16 @@ const transformClassBodyMember = path => {
 };
 
 const classPropertyToVariableDeclaration = path => {
-  exportStateSettersOutOfPath(path);
   const name = path.get("key").get("name").node;
+  if (name === "state") {
+    return generateStateHooksFromClassProperty(path);
+  } else {
+    exportStateSettersOutOfPath(path);
 
-  return t.variableDeclaration("const", [
-    t.variableDeclarator(t.identifier(name), path.get("value").node)
-  ]);
+    return t.variableDeclaration("const", [
+      t.variableDeclarator(t.identifier(name), path.get("value").node)
+    ]);
+  }
 };
 
 /**
