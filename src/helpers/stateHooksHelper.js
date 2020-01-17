@@ -5,7 +5,7 @@ const { default: generate } = require("@babel/generator");
 /**
  * Takes the constructor path and exports any state as state hooks
  * @param {*} path
- * @returns {nodes}
+ * @returns {Array<nodes>}
  */
 const exportStateOutOfConstructor = path => {
   const nodes = [];
@@ -103,6 +103,7 @@ const generateSetterName = propName => {
 };
 
 exports.exportStateOutOfConstructor = exportStateOutOfConstructor;
-// exports.memberExpressionIsState = memberExpressionIsState;
+exports.isStateAssignmentExpression = isStateAssignmentExpression;
+exports.generateStateHooks = generateStateHooks;
 exports.generateStateHook = generateStateHook;
 exports.generateSetterName = generateSetterName;

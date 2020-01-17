@@ -1,6 +1,6 @@
 const { parse } = require("@babel/parser");
 const { default: traverse } = require("@babel/traverse");
-const { default: generator } = require("@babel/generator");
+const { default: generate } = require("@babel/generator");
 const { thisExpressionVisitor } = require("../src/helpers/removeThisHelper");
 
 describe("thisExpressionVisitor", () => {
@@ -11,7 +11,7 @@ describe("thisExpressionVisitor", () => {
   ])("Should visit '%s' and return '%s'", (input, output) => {
     const ast = parse(input);
     traverse(ast, thisExpressionVisitor);
-    const actual = generator(ast).code;
+    const actual = generate(ast).code;
     expect(actual).toBe(output);
   });
 });
