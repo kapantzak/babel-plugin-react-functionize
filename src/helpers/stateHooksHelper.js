@@ -102,7 +102,42 @@ const generateSetterName = propName => {
   return null;
 };
 
+const exportStateSettersOutOfClassMethodBody = classMethodBodyPath => {
+  classMethodBodyPath.traverse(stateSetterVisitor);
+};
+
+const stateSetterVisitor = {
+  AssignmentExpression(path) {
+    if (isStateAssignmentExpression(path)) {
+      path.replaceWith(generateStateSetter(path));
+    }
+  }
+};
+
+/**
+ * Convert a state assignment expression to the appropriate state setter call expression
+ * @param {path} stateAssignmentExpressionPath
+ * @returns {node}
+ */
+const generateStateSetter = stateAssignmentExpressionPath => {
+  const stateAssignmentExpressionNode = stateAssignmentExpressionPath.node;
+  const leftMemberExpressionLiteral = generate(
+    stateAssignmentExpressionNode.left,
+    {
+      concise: true
+    }
+  ).code;
+
+  const tokens = leftMemberExpressionLiteral.split(".");
+  if (tokens.length === 3 && tokens.slice(0, 2).join(".") === "this.state") {
+    return t.callExpression(t.identifier(generateSetterName(tokens[2])), [
+      stateAssignmentExpressionNode.right
+    ]);
+  }
+};
+
 exports.exportStateOutOfConstructor = exportStateOutOfConstructor;
+exports.exportStateSettersOutOfClassMethodBody = exportStateSettersOutOfClassMethodBody;
 exports.isStateAssignmentExpression = isStateAssignmentExpression;
 exports.generateStateHooks = generateStateHooks;
 exports.generateStateHook = generateStateHook;

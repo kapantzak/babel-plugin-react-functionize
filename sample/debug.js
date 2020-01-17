@@ -16,9 +16,11 @@ class App extends Component {
     this.state.name = "John";
   };
 
-  //componentDidMount() {
-  //console.log("");
-  //}
+  componentDidMount() {
+    console.log("test");
+    this.state.count = 1;
+    this.state.name = "John";
+  }
 
   render() {
     return (

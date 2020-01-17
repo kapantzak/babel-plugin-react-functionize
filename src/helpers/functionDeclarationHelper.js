@@ -1,5 +1,8 @@
 const { types: t } = require("@babel/core");
-const { exportStateOutOfConstructor } = require("./stateHooksHelper");
+const {
+  exportStateOutOfConstructor,
+  exportStateSettersOutOfClassMethodBody
+} = require("./stateHooksHelper");
 const { removeThisExpression } = require("./removeThisHelper");
 
 const buildFunctionFromClassDeclaration = classDeclarationPath => {
@@ -33,6 +36,7 @@ const iterateClassDeclarationBody = classDeclarationPath => {
 /**
  * Switch between different types of nodes and return the transformed node
  * @param {path} path
+ * @returns {node}
  */
 const transformClassBodyMember = path => {
   if (t.isClassProperty(path)) return classPropertyToVariableDeclaration(path);
@@ -81,8 +85,21 @@ const renderMethodToReturnStatement = classMethodPath => {
   return removeThisExpression(returnStatementPath).node;
 };
 
+/**
+ * Convert componentDidMount class method to useEffect expression statement
+ * @param {path} classMethodPath
+ * @returns {node} useEffect expression statement
+ */
 const componentDidMountToUseEffect = classMethodPath => {
-  return null;
+  exportStateSettersOutOfClassMethodBody(classMethodPath);
+  return t.expressionStatement(
+    t.callExpression(t.identifier("useEffect"), [
+      t.arrowFunctionExpression(
+        [],
+        t.blockStatement(classMethodPath.node.body.body)
+      )
+    ])
+  );
 };
 
 exports.buildFunctionFromClassDeclaration = buildFunctionFromClassDeclaration;
