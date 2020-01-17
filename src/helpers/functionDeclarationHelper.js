@@ -1,7 +1,7 @@
 const { types: t } = require("@babel/core");
 const {
   exportStateOutOfConstructor,
-  exportStateSettersOutOfClassMethodBody
+  exportStateSettersOutOfPath
 } = require("./stateHooksHelper");
 const { removeThisExpression } = require("./removeThisHelper");
 
@@ -45,6 +45,7 @@ const transformClassBodyMember = path => {
 };
 
 const classPropertyToVariableDeclaration = path => {
+  exportStateSettersOutOfPath(path);
   const name = path.get("key").get("name").node;
 
   return t.variableDeclaration("const", [
@@ -91,7 +92,7 @@ const renderMethodToReturnStatement = classMethodPath => {
  * @returns {node} useEffect expression statement
  */
 const componentDidMountToUseEffect = classMethodPath => {
-  exportStateSettersOutOfClassMethodBody(classMethodPath);
+  exportStateSettersOutOfPath(classMethodPath);
   return t.expressionStatement(
     t.callExpression(t.identifier("useEffect"), [
       t.arrowFunctionExpression(

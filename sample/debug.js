@@ -13,6 +13,7 @@ class App extends Component {
   }
 
   methodName = () => {
+    console.log("test 1");
     this.state.name = "John";
   };
 

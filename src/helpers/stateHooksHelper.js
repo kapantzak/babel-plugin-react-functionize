@@ -102,8 +102,8 @@ const generateSetterName = propName => {
   return null;
 };
 
-const exportStateSettersOutOfClassMethodBody = classMethodBodyPath => {
-  classMethodBodyPath.traverse(stateSetterVisitor);
+const exportStateSettersOutOfPath = path => {
+  path.traverse(stateSetterVisitor);
 };
 
 const stateSetterVisitor = {
@@ -137,7 +137,7 @@ const generateStateSetter = stateAssignmentExpressionPath => {
 };
 
 exports.exportStateOutOfConstructor = exportStateOutOfConstructor;
-exports.exportStateSettersOutOfClassMethodBody = exportStateSettersOutOfClassMethodBody;
+exports.exportStateSettersOutOfPath = exportStateSettersOutOfPath;
 exports.isStateAssignmentExpression = isStateAssignmentExpression;
 exports.generateStateHooks = generateStateHooks;
 exports.generateStateHook = generateStateHook;
