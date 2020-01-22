@@ -19,6 +19,10 @@ class App extends Component {
     }, 5000);
   }
 
+  componentDidUpdate() {
+    console.log("test");
+  }
+
   logName = () => {
     // do whatever with the names ... let's just log them here
     console.log(this.state.userName);

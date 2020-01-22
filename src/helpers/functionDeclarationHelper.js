@@ -1,4 +1,5 @@
 const { types: t } = require("@babel/core");
+const { default: traverse } = require("@babel/traverse");
 const {
   exportStateOutOfConstructor,
   exportStateSettersOutOfPath,
@@ -8,11 +9,38 @@ const { removeThisExpression } = require("./removeThisHelper");
 
 const buildFunctionFromClassDeclaration = classDeclarationPath => {
   const functionBody = iterateClassDeclarationBody(classDeclarationPath);
+  const functionBody_concat_useEffect = concatUseEffectStatements(functionBody);
   return t.functionDeclaration(
     t.identifier(classDeclarationPath.node.id.name),
     [t.identifier("props")],
-    t.blockStatement(functionBody)
+    t.blockStatement(functionBody_concat_useEffect)
   );
+};
+
+const concatUseEffectStatements = functionBody => {
+  // const useEffectContents = [];
+  // let firstUseEffectIndex = null;
+  // functionBody.forEach((x, index) => {
+  //   if (
+  //     x.type === "ExpressionStatement" &&
+  //     (x.callee || {}).name === "useEffect"
+  //   ) {
+  //     if (firstUseEffectIndex !== null) {
+  //       firstUseEffectIndex = index;
+  //     }
+  //     (x.arguments || []).forEach(arg => {
+  //       if (arg.type === "ArrowFunctionExpression") {
+  //         const argBody = (arg.body || {}).body || [];
+  //         if (argBody.length > 0) {
+  //           argBody.forEach(argB => {
+  //             useEffectContents.push(argB);
+  //           });
+  //         }
+  //       }
+  //     });
+  //   }
+  // });
+  return functionBody;
 };
 
 const iterateClassDeclarationBody = classDeclarationPath => {
@@ -61,6 +89,7 @@ const classPropertyToVariableDeclaration = path => {
 /**
  * Switch between different class method names and return the appropriate type
  * @param {path} path
+ * @returns {node}
  */
 const switchClassMethods = path => {
   if (path.get("kind").node === "constructor") {
@@ -72,7 +101,9 @@ const switchClassMethods = path => {
     case "render":
       return renderMethodToReturnStatement(path);
     case "componentDidMount":
-      return componentDidMountToUseEffect(path);
+    case "componentDidUpdate":
+    case "componentWillUnmount":
+      return lifecycleMethodToUseEffect(path);
     default:
       return null;
   }
@@ -92,11 +123,11 @@ const renderMethodToReturnStatement = classMethodPath => {
 };
 
 /**
- * Convert componentDidMount class method to useEffect expression statement
+ * Convert life cycle method to useEffect expression statement
  * @param {path} classMethodPath
  * @returns {node} useEffect expression statement
  */
-const componentDidMountToUseEffect = classMethodPath => {
+const lifecycleMethodToUseEffect = classMethodPath => {
   exportStateSettersOutOfPath(classMethodPath);
   return t.expressionStatement(
     t.callExpression(t.identifier("useEffect"), [
